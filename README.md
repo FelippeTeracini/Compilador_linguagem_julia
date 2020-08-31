@@ -5,11 +5,11 @@ Compilador
 
 Run the code:
 
-    $ python main.py
+    $ python main.py 'operation'
 
-And then type the operation (e.g):
+Where operation is a mathematical equation containing the + and - operators (e.g):
 
-    $ 1 + 1
+    $ python main.py  '1 + 1'
 
 The return should be the result of the operation (e.g):
 

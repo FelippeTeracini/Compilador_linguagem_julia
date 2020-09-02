@@ -5,12 +5,17 @@ Compilador
 
 Run the code:
 
-    $ python main.py 'operation'
+    $ python main.py "operation"
 
-Where operation is a mathematical equation containing the + and - operators (e.g):
+Where operation is a mathematical operation containing + and - operators (e.g):
 
-    $ python main.py  '1 + 1'
+    $ python main.py "1 + 1"
 
 The return should be the result of the operation (e.g):
 
     $ 2
+
+Alternatively it is also possible to use a text file to represent the input. To do that,
+write the operation on the text file and then run the following code:
+
+    $ python main.py < example.txt

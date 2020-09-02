@@ -28,6 +28,12 @@ class Tokenizer:
             elif(current_token == '+'):
                 self.actual = Token('PLUS', current_token)
                 self.position += 1
+            elif(current_token == '*'):
+                self.actual = Token('MULT', current_token)
+                self.position += 1
+            elif(current_token == '/'):
+                self.actual = Token('DIV', current_token)
+                self.position += 1
             elif(current_token == ''):
                 self.actual = Token('EOF', current_token)
                 self.position += 1

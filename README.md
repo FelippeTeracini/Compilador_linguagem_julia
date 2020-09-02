@@ -1,6 +1,14 @@
 # Compilador
 Compilador
 
+# EBNF
+
+    
+
+# SYNTATIC DIAGRAM
+
+![Alt text](Diagrama_Sintatico.png)
+
 # HOW TO RUN
 
 Run the code:

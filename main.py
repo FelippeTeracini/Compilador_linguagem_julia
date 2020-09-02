@@ -1,4 +1,7 @@
 import sys
 from Parser import *
+from PrePro import *
 
-print(Parser.run(sys.argv[1]))
+code = sys.argv[1]
+code = PrePro().filter(code)
+print(Parser.run(code))

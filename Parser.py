@@ -28,7 +28,10 @@ class Parser:
                         raise ValueError(
                             'A token of type INT must come after a token of type MINUS')
                 Parser.tokens.selectNext()
-            return result
+            if(Parser.tokens.actual.token_type == 'EOF'):
+                return result
+            else:
+                raise ValueError('Ended Before EOF')
         raise ValueError('Must start with a token of type INT')
 
     @staticmethod

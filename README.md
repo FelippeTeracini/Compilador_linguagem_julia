@@ -15,7 +15,7 @@ Run the code:
 
     $ python main.py "operation"
 
-Where operation is a mathematical operation containing + and - operators (e.g):
+Where operation is a mathematical operation containing +, -, * and / operators (e.g):
 
     $ python main.py "1 + 1"
 

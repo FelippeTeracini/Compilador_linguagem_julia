@@ -3,7 +3,10 @@ Compilador
 
 # EBNF
 
-    
+    Expression = Term, {("+"|"-"), Term};
+    Term = Number, {("*"|"/"), Number};
+    Number = Digit, {Digit};
+    Digit = 0|1|2|3|4|5|6|7|8|9;
 
 # SYNTATIC DIAGRAM
 
@@ -15,7 +18,7 @@ Run the code:
 
     $ python main.py "operation"
 
-Where operation is a mathematical operation containing + and - operators (e.g):
+Where operation is a mathematical operation containing +, -, * and / operators (e.g):
 
     $ python main.py "1 + 1"
 

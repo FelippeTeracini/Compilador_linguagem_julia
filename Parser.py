@@ -23,7 +23,7 @@ class Parser:
                 elif Parser.tokens.actual.token_type == 'DIV':
                     Parser.tokens.selectNext()
                     if Parser.tokens.actual.token_type == 'INT':
-                        result /= Parser.tokens.actual.token_value
+                        result = int(result / Parser.tokens.actual.token_value)
                     else:
                         raise ValueError(
                             'A token of type INT must come after a token of type DIV')

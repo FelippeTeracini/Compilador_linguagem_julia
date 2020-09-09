@@ -34,6 +34,12 @@ class Tokenizer:
             elif(current_token == '/'):
                 self.actual = Token('DIV', current_token)
                 self.position += 1
+            elif(current_token == '('):
+                self.actual = Token('OPEN_P', current_token)
+                self.position += 1
+            elif(current_token == ')'):
+                self.actual = Token('CLOSE_P', current_token)
+                self.position += 1
             elif(current_token == ''):
                 self.actual = Token('EOF', current_token)
                 self.position += 1

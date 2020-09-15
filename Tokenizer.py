@@ -6,6 +6,7 @@ class Tokenizer:
         self.origin = origin
         self.position = 0
         self.actual = None
+        self.selectNext()
 
     def selectNext(self):
         if(self.position < len(self.origin)):

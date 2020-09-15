@@ -8,19 +8,23 @@ class Parser:
     @staticmethod
     def parseFactor():
         result = 0
-        Parser.tokens.selectNext()
         if(Parser.tokens.actual.token_type == 'INT'):
             result = Parser.tokens.actual.token_value
+            Parser.tokens.selectNext()
             return result
         elif(Parser.tokens.actual.token_type == 'PLUS'):
+            Parser.tokens.selectNext()
             result = Parser.parseFactor()
             return result
         elif(Parser.tokens.actual.token_type == 'MINUS'):
+            Parser.tokens.selectNext()
             result = -(Parser.parseFactor())
             return result
         elif(Parser.tokens.actual.token_type == 'OPEN_P'):
+            Parser.tokens.selectNext()
             result = Parser.parseExpression()
             if(Parser.tokens.actual.token_type == 'CLOSE_P'):
+                Parser.tokens.selectNext()
                 return result
             else:
                 raise ValueError('( must have a matching )')
@@ -33,32 +37,33 @@ class Parser:
     def parseTerm():
         result = 0
         result = Parser.parseFactor()
-        Parser.tokens.selectNext()
         while(Parser.tokens.actual.token_type == 'MULT' or Parser.tokens.actual.token_type == 'DIV'):
             if Parser.tokens.actual.token_type == 'MULT':
+                Parser.tokens.selectNext()
                 result *= Parser.parseFactor()
             elif Parser.tokens.actual.token_type == 'DIV':
+                Parser.tokens.selectNext()
                 result = int(result/Parser.parseFactor())
-            Parser.tokens.selectNext()
         return result
 
     @staticmethod
     def parseExpression():
         result = 0
         result = Parser.parseTerm()
-        while(Parser.tokens.actual.token_type == 'PLUS' or Parser.tokens.actual.token_type == 'MINUS' or Parser.tokens.actual.token_type == 'CLOSE_P'):
+        while(Parser.tokens.actual.token_type == 'PLUS' or Parser.tokens.actual.token_type == 'MINUS'):
             if Parser.tokens.actual.token_type == 'PLUS':
+                Parser.tokens.selectNext()
                 result += Parser.parseTerm()
             elif Parser.tokens.actual.token_type == 'MINUS':
+                Parser.tokens.selectNext()
                 result -= Parser.parseTerm()
-            elif Parser.tokens.actual.token_type == 'CLOSE_P':
-                return result
-        if(Parser.tokens.actual.token_type == 'EOF'):
-            return result
-        else:
-            raise ValueError('Ended Before EOF')
+        return result
 
     @staticmethod
     def run(code):
         Parser.tokens = Tokenizer(code)
-        return Parser.parseExpression()
+        result = Parser.parseExpression()
+        if(Parser.tokens.actual.token_type == 'EOF'):
+            return result
+        else:
+            raise ValueError('Ended Before EOF')

@@ -2,6 +2,9 @@ import sys
 from Parser import *
 from PrePro import *
 
-code = sys.argv[1]
+
+file = open(sys.argv[1], "r")
+code = file.read()
 code = PrePro().filter(code)
-print(Parser.run(code))
+ast = Parser.run(code)
+print(ast.evaluate())

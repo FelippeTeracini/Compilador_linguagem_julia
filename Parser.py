@@ -1,4 +1,5 @@
 from Tokenizer import *
+from Nodes import *
 
 
 class Parser:
@@ -7,18 +8,14 @@ class Parser:
 
     @staticmethod
     def parseFactor():
-        result = 0
         if(Parser.tokens.actual.token_type == 'INT'):
-            result = Parser.tokens.actual.token_value
+            result = IntVal(Parser.tokens.actual.token_value)
             Parser.tokens.selectNext()
             return result
-        elif(Parser.tokens.actual.token_type == 'PLUS'):
+        elif(Parser.tokens.actual.token_type == 'PLUS' or Parser.tokens.actual.token_type == 'MINUS'):
+            result = UnOp(Parser.tokens.actual.token_value)
             Parser.tokens.selectNext()
-            result = Parser.parseFactor()
-            return result
-        elif(Parser.tokens.actual.token_type == 'MINUS'):
-            Parser.tokens.selectNext()
-            result = -(Parser.parseFactor())
+            result.children[0] = Parser.parseFactor()
             return result
         elif(Parser.tokens.actual.token_type == 'OPEN_P'):
             Parser.tokens.selectNext()
@@ -35,28 +32,26 @@ class Parser:
 
     @staticmethod
     def parseTerm():
-        result = 0
         result = Parser.parseFactor()
         while(Parser.tokens.actual.token_type == 'MULT' or Parser.tokens.actual.token_type == 'DIV'):
-            if Parser.tokens.actual.token_type == 'MULT':
+            if Parser.tokens.actual.token_type == 'MULT' or Parser.tokens.actual.token_type == 'DIV':
+                node = BinOp(Parser.tokens.actual.token_value)
+                node.children[0] = result
+                result = node
                 Parser.tokens.selectNext()
-                result *= Parser.parseFactor()
-            elif Parser.tokens.actual.token_type == 'DIV':
-                Parser.tokens.selectNext()
-                result = int(result/Parser.parseFactor())
+                result.children[1] = Parser.parseFactor()
         return result
 
     @staticmethod
     def parseExpression():
-        result = 0
         result = Parser.parseTerm()
         while(Parser.tokens.actual.token_type == 'PLUS' or Parser.tokens.actual.token_type == 'MINUS'):
-            if Parser.tokens.actual.token_type == 'PLUS':
+            if Parser.tokens.actual.token_type == 'PLUS' or Parser.tokens.actual.token_type == 'MINUS':
+                node = BinOp(Parser.tokens.actual.token_value)
+                node.children[0] = result
+                result = node
                 Parser.tokens.selectNext()
-                result += Parser.parseTerm()
-            elif Parser.tokens.actual.token_type == 'MINUS':
-                Parser.tokens.selectNext()
-                result -= Parser.parseTerm()
+                result.children[1] = Parser.parseTerm()
         return result
 
     @staticmethod

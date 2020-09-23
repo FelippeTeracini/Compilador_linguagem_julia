@@ -14,14 +14,32 @@ class Tokenizer:
             if(current_token == ' '):
                 self.position += 1
                 self.selectNext()
-            elif(current_token in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']):
+            elif(current_token.isnumeric()):
                 if(self.position + 1 < len(self.origin)):
-                    while(self.origin[self.position + 1] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']):
+                    while(self.origin[self.position + 1].isnumeric()):
                         self.position += 1
                         current_token += self.origin[self.position]
                         if(self.position + 1 >= len(self.origin)):
                             break
                 self.actual = Token('INT', int(current_token))
+                self.position += 1
+            elif(current_token.isalpha()):
+                if(self.position + 1 < len(self.origin)):
+                    while(self.origin[self.position + 1].isalpha() or self.origin[self.position + 1].isnumeric() or self.origin[self.position + 1] == "_"):
+                        self.position += 1
+                        current_token += self.origin[self.position]
+                        if(self.position + 1 >= len(self.origin)):
+                            break
+                if(current_token == "println"):
+                    self.actual = Token('PRINT', current_token)
+                else:
+                    self.actual = Token('IDENTIFIER', current_token)
+                self.position += 1
+            elif(current_token == "\n"):
+                self.actual = Token("END_LINE", '')
+                self.position += 1
+            elif(current_token == "="):
+                self.actual = Token('SET_EQUAL', current_token)
                 self.position += 1
             elif(current_token == '-'):
                 self.actual = Token('MINUS', current_token)

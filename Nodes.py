@@ -1,3 +1,8 @@
+from SymbolTable import *
+
+symbol_table = SymbolTable()
+
+
 class Node():
 
     def __init__(self, value):
@@ -51,8 +56,42 @@ class IntVal(Node):
 
 class NoOp(Node):
 
+    def __init__(self):
+        pass
+
+    def evaluate(self):
+        pass
+
+
+class Assignement(Node):
+    def __init__(self):
+        self.children = [None, None]
+
+    def evaluate(self):
+        symbol_table.set_symbol(
+            self.children[0].value, self.children[1].evaluate())
+
+
+class Identifier(Node):
     def __init__(self, value):
         self.value = value
 
-    def evalueate(self):
-        return self.value
+    def evaluate(self):
+        return symbol_table.get_symbol(self.value)
+
+
+class Statement(Node):
+    def __init__(self):
+        self.children = []
+
+    def evaluate(self):
+        for child in self.children:
+            child.evaluate()
+
+
+class Print(Node):
+    def __init__(self):
+        self.children = [None]
+
+    def evaluate(self):
+        print(self.children[0].evaluate())

@@ -12,6 +12,10 @@ class Parser:
             result = IntVal(Parser.tokens.actual.token_value)
             Parser.tokens.selectNext()
             return result
+        elif(Parser.tokens.actual.token_type == 'IDENTIFIER'):
+            result = Identifier(Parser.tokens.actual.token_value)
+            Parser.tokens.selectNext()
+            return result
         elif(Parser.tokens.actual.token_type == 'PLUS' or Parser.tokens.actual.token_type == 'MINUS'):
             result = UnOp(Parser.tokens.actual.token_value)
             Parser.tokens.selectNext()
@@ -55,9 +59,50 @@ class Parser:
         return result
 
     @staticmethod
+    def parseCommand():
+        node = NoOp()
+        if(Parser.tokens.actual.token_type == 'IDENTIFIER'):
+            identifier = Identifier(Parser.tokens.actual.token_value)
+            Parser.tokens.selectNext()
+            if(Parser.tokens.actual.token_type == 'SET_EQUAL'):
+                Parser.tokens.selectNext()
+                node = Assignement()
+                node.children[0] = identifier
+                node.children[1] = Parser.parseExpression()
+            else:
+                raise ValueError(
+                    "IDENTIFIER token needs SET_EQUAL token after in COMMAND")
+        elif(Parser.tokens.actual.token_type == 'PRINT'):
+            Parser.tokens.selectNext()
+            if(Parser.tokens.actual.token_type == 'OPEN_P'):
+                Parser.tokens.selectNext()
+                node = Print()
+                node.children[0] = Parser.parseExpression()
+                if(Parser.tokens.actual.token_type == 'CLOSE_P'):
+                    Parser.tokens.selectNext()
+                    return node
+                else:
+                    raise ValueError('( must have a matching )')
+            else:
+                raise ValueError('PRINT token needs to be followed by (')
+
+        if(Parser.tokens.actual.token_type == 'END_LINE'):
+            Parser.tokens.selectNext()
+            return node
+        else:
+            raise ValueError("Needs END_LINE token")
+
+    @staticmethod
+    def parseBlock():
+        node = Statement()
+        while(Parser.tokens.actual.token_type != 'EOF'):
+            node.children.append(Parser.parseCommand())
+        return node
+
+    @staticmethod
     def run(code):
         Parser.tokens = Tokenizer(code)
-        result = Parser.parseExpression()
+        result = Parser.parseBlock()
         if(Parser.tokens.actual.token_type == 'EOF'):
             return result
         else:

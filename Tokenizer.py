@@ -6,6 +6,8 @@ class Tokenizer:
         self.origin = origin
         self.position = 0
         self.actual = None
+        self.reserved = {"println": 'PRINT', "while": 'WHILE',
+                         "if": 'IF', "elseif": 'ELSEIF', "else": 'ELSE', "end": 'END', "readline": 'RDLN'}
         self.selectNext()
 
     def selectNext(self):
@@ -30,8 +32,9 @@ class Tokenizer:
                         current_token += self.origin[self.position]
                         if(self.position + 1 >= len(self.origin)):
                             break
-                if(current_token == "println"):
-                    self.actual = Token('PRINT', current_token)
+                if(current_token in self.reserved):
+                    self.actual = Token(
+                        self.reserved[current_token], current_token)
                 else:
                     self.actual = Token('IDENTIFIER', current_token)
                 self.position += 1
@@ -39,7 +42,46 @@ class Tokenizer:
                 self.actual = Token("END_LINE", '')
                 self.position += 1
             elif(current_token == "="):
-                self.actual = Token('SET_EQUAL', current_token)
+                if(self.position + 1 < len(self.origin)):
+                    if(self.origin[self.position + 1] == "="):
+                        self.position += 1
+                        current_token += self.origin[self.position]
+                        self.actual = Token('EQUALS', current_token)
+                    else:
+                        self.actual = Token('SET_EQUAL', current_token)
+                else:
+                    self.actual = Token('SET_EQUAL', current_token)
+                self.position += 1
+            elif(current_token == ">"):
+                self.actual = Token('GREATER', current_token)
+                self.position += 1
+            elif(current_token == "<"):
+                self.actual = Token('SMALLER', current_token)
+                self.position += 1
+            elif(current_token == "!"):
+                self.actual = Token('NOT', current_token)
+                self.position += 1
+            elif(current_token == "&"):
+                if(self.position + 1 < len(self.origin)):
+                    if(self.origin[self.position + 1] == "&"):
+                        self.position += 1
+                        current_token += self.origin[self.position]
+                        self.actual = Token('AND', current_token)
+                    else:
+                        raise ValueError('Invalid Token')
+                else:
+                    raise ValueError('Invalid Token')
+                self.position += 1
+            elif(current_token == "|"):
+                if(self.position + 1 < len(self.origin)):
+                    if(self.origin[self.position + 1] == "|"):
+                        self.position += 1
+                        current_token += self.origin[self.position]
+                        self.actual = Token('OR', current_token)
+                    else:
+                        raise ValueError('Invalid Token')
+                else:
+                    raise ValueError('Invalid Token')
                 self.position += 1
             elif(current_token == '-'):
                 self.actual = Token('MINUS', current_token)

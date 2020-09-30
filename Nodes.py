@@ -31,6 +31,21 @@ class BinOp(Node):
         elif self.value == "/":
             return int(self.children[0].evaluate() / self.children[1].evaluate())
 
+        elif self.value == "||":
+            return self.children[0].evaluate() or self.children[1].evaluate()
+
+        elif self.value == "&&":
+            return self.children[0].evaluate() and self.children[1].evaluate()
+
+        elif self.value == "==":
+            return self.children[0].evaluate() == self.children[1].evaluate()
+
+        elif self.value == ">":
+            return self.children[0].evaluate() > self.children[1].evaluate()
+
+        elif self.value == "<":
+            return self.children[0].evaluate() < self.children[1].evaluate()
+
 
 class UnOp(Node):
     def __init__(self, value):
@@ -43,6 +58,9 @@ class UnOp(Node):
 
         elif self.value == "-":
             return - self.children[0].evaluate()
+
+        elif self.value == "!":
+            return not self.children[0].evaluate()
 
 
 class IntVal(Node):
@@ -95,3 +113,40 @@ class Print(Node):
 
     def evaluate(self):
         print(self.children[0].evaluate())
+
+
+class ReadLine(Node):
+    def __init__(self):
+        pass
+
+    def evaluate(self):
+        return int(input())
+
+
+class While(Node):
+    def __init__(self):
+        self.children = [None, None]
+
+    def evaluate(self):
+        while(self.children[0].evaluate()):
+            self.children[1].evaluate()
+
+
+class If(Node):
+    def __init__(self):
+        self.children = [None, None, None]
+
+    def evaluate(self):
+        if(self.children[0].evaluate()):
+            self.children[1].evaluate()
+        else:
+            if(self.children[2]):
+                self.children[2].evaluate()
+
+
+class Else(Node):
+    def __init__(self):
+        self.children = [None]
+
+    def evaluate(self):
+        return self.children[0].evaluate()

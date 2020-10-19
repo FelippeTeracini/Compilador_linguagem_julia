@@ -1,4 +1,4 @@
-x = 0
+x = readline()
 while (x < 10) || (x == 10)
     if(x < 5)
         println(0)

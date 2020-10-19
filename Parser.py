@@ -123,14 +123,43 @@ class Parser:
 
                 node.children[1] = Parser.parseBlock()
 
-                # if(Parser.tokens.actual.token_type == 'ELSEIF'):
-                #     while(Parser.tokens.actual.token_type == 'ELSEIF'):
-                #         Parser.tokens.selectNext()
-                #         node2 = If()
-                #         node2.children[0] = Parser.parseRelEx()
-                #         node2.children[1] = Parser.parseBlock()
+                if(Parser.tokens.actual.token_type == 'ELSEIF'):
+                    nodes = []
+                    while(Parser.tokens.actual.token_type == 'ELSEIF'):
+                        Parser.tokens.selectNext()
+                        node2 = If()
+                        node2.children[0] = Parser.parseRelEx()
+                        if(Parser.tokens.actual.token_type == 'END_LINE'):
+                            Parser.tokens.selectNext()
+                            node2.children[1] = Parser.parseBlock()
+                            nodes.append(node2)
+                        else:
+                            raise ValueError("ELSEIF needs END_LINE after")
 
-                if(Parser.tokens.actual.token_type == 'ELSE'):
+                    node.children[2] = nodes[0]
+                    for i in range(len(nodes)):
+                        if(i != len(nodes) - 1):
+                            nodes[i].children[2] = nodes[i+1]
+
+                    if(Parser.tokens.actual.token_type == 'ELSE'):
+                        Parser.tokens.selectNext()
+                        if(Parser.tokens.actual.token_type == 'END_LINE'):
+                            Parser.tokens.selectNext()
+                            node2 = Else()
+                            node2.children[0] = Parser.parseBlock()
+                            nodes[-1].children[2] = node2
+                            if(Parser.tokens.actual.token_type == 'END'):
+                                Parser.tokens.selectNext()
+                            else:
+                                raise ValueError("ELSE needs END token")
+                        else:
+                            raise ValueError("ELSE needs END_LINE after")
+                    elif(Parser.tokens.actual.token_type == 'END'):
+                        Parser.tokens.selectNext()
+                    else:
+                        raise ValueError("IF needs END token")
+
+                elif(Parser.tokens.actual.token_type == 'ELSE'):
                     Parser.tokens.selectNext()
                     if(Parser.tokens.actual.token_type == 'END_LINE'):
                         Parser.tokens.selectNext()
@@ -171,7 +200,7 @@ class Parser:
     @staticmethod
     def parseBlock():
         node = Statement()
-        while(Parser.tokens.actual.token_type != 'EOF' and Parser.tokens.actual.token_type != 'END' and Parser.tokens.actual.token_type != 'ELSE'):
+        while(Parser.tokens.actual.token_type != 'EOF' and Parser.tokens.actual.token_type != 'END' and Parser.tokens.actual.token_type != 'ELSE' and Parser.tokens.actual.token_type != 'ELSEIF'):
             node.children.append(Parser.parseCommand())
         return node
 

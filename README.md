@@ -25,7 +25,7 @@ Run the code:
 
     $ python main.py "file.jl"
 
-Where file.jl is a julia file containing mathematical operations containing +, -, *, /, ( and ) operators (e.g):
+Where file.jl is a julia file that works with the ebnf (e.g):
 
     $ python main.py "test.jl"
 

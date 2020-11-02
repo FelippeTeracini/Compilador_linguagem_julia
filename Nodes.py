@@ -231,7 +231,7 @@ class While(Node):
         self.children = [None, None]
 
     def evaluate(self):
-        while(self.children[0].evaluate()):
+        while(self.children[0].evaluate()[0]):
             self.children[1].evaluate()
 
 
@@ -240,7 +240,7 @@ class If(Node):
         self.children = [None, None, None]
 
     def evaluate(self):
-        if(self.children[0].evaluate()):
+        if(self.children[0].evaluate()[0]):
             self.children[1].evaluate()
         else:
             if(self.children[2]):

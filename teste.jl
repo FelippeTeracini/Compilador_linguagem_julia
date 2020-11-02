@@ -1,10 +1,13 @@
-local w :: Int
-local x :: String
-local y :: Bool
-local z :: String
-w = 1
-x = "da"
-y = true
-z = w + x * y
-println(w == x)
+local x::Int
+local y::String
+x = 0
+y = "mamus"
+while y == "mamus"
+x = x + 1
+println(x)
+if x > 2
+y = "dale"
+end
+end
+println("terminei")
 

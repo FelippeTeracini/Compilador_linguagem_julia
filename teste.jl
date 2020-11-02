@@ -1,11 +1,7 @@
-x = readline()
-while (x < 10) || (x == 10)
-    if(x < 5)
-        println(0)
-    elseif(x == 5)
-        println(1)
-    else
-        println(2)
-    end
-    x = (x + 1)
-end
+local y::Int
+local x::Bool
+x = true
+x = false
+y = --x
+println(y)
+

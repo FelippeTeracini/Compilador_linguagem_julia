@@ -12,6 +12,10 @@ class Parser:
             result = IntVal(Parser.tokens.actual.token_value)
             Parser.tokens.selectNext()
             return result
+        elif(Parser.tokens.actual.token_type == 'TRUE' or Parser.tokens.actual.token_type == 'FALSE'):
+            result = BoolVal(Parser.tokens.actual.token_value)
+            Parser.tokens.selectNext()
+            return result
         elif(Parser.tokens.actual.token_type == 'IDENTIFIER'):
             result = Identifier(Parser.tokens.actual.token_value)
             Parser.tokens.selectNext()
@@ -179,6 +183,24 @@ class Parser:
             else:
                 raise ValueError("IF needs END_LINE after RELEX")
 
+        elif(Parser.tokens.actual.token_type == 'LOCAL'):
+            Parser.tokens.selectNext()
+            if(Parser.tokens.actual.token_type == 'IDENTIFIER'):
+                node = TypeAssignement()
+                node.children[0] = Identifier(Parser.tokens.actual.token_value)
+                Parser.tokens.selectNext()
+                if(Parser.tokens.actual.token_type == 'SET_TYPE'):
+                    Parser.tokens.selectNext()
+                    if(Parser.tokens.actual.token_type == 'INT_TYPE' or Parser.tokens.actual.token_type == 'BOOL_TYPE' or Parser.tokens.actual.token_type == 'STRING_TYPE'):
+                        node.children[1] = Parser.tokens.actual.token_value
+                        Parser.tokens.selectNext()
+                    else:
+                        raise ValueError("Needs TYPE after SET_TYPE")
+                else:
+                    raise ValueError(
+                        "Needs SET_TYPE after IDENTIFIER after LOCAL")
+            else:
+                raise ValueError("Needs IDENTIFIER after LOCAL")
         if(Parser.tokens.actual.token_type == 'END_LINE'):
             Parser.tokens.selectNext()
             return node

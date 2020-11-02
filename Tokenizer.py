@@ -7,7 +7,10 @@ class Tokenizer:
         self.position = 0
         self.actual = None
         self.reserved = {"println": 'PRINT', "while": 'WHILE',
-                         "if": 'IF', "elseif": 'ELSEIF', "else": 'ELSE', "end": 'END', "readline": 'RDLN'}
+                         "if": 'IF', "elseif": 'ELSEIF', "else": 'ELSE',
+                         "end": 'END', "readline": 'RDLN', "local": 'LOCAL',
+                         "Int": 'INT_TYPE', "Bool": 'BOOL_TYPE', "String": 'STRING_TYPE',
+                         "true": 'TRUE', "false": 'FALSE'}
         self.selectNext()
 
     def selectNext(self):
@@ -37,6 +40,17 @@ class Tokenizer:
                         self.reserved[current_token], current_token)
                 else:
                     self.actual = Token('IDENTIFIER', current_token)
+                self.position += 1
+            elif(current_token == ":"):
+                if(self.position + 1 < len(self.origin)):
+                    if(self.origin[self.position + 1] == ":"):
+                        self.position += 1
+                        current_token += self.origin[self.position]
+                        self.actual = Token('SET_TYPE', current_token)
+                    else:
+                        raise ValueError('Invalid Token')
+                else:
+                    raise ValueError('Invalid Token')
                 self.position += 1
             elif(current_token == "\n"):
                 self.actual = Token("END_LINE", '')

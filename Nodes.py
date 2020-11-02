@@ -23,28 +23,58 @@ class BinOp(Node):
         children1 = self.children[1].evaluate()
 
         if self.value == "+":
-            return [children0[0] + children1[0], 'Int']
+            if(children0[1] != 'String' and children1[1] != 'String'):
+                return [children0[0] + children1[0], 'Int']
+            else:
+                raise ValueError('+ Operation not valid for String')
 
         elif self.value == "-":
-            return [children0[0] - children1[0], 'Int']
+            if(children0[1] != 'String' and children1[1] != 'String'):
+                return [children0[0] - children1[0], 'Int']
+            else:
+                raise ValueError('- Operation not valid for String')
 
         elif self.value == "*":
-            return [children0[0] * children1[0], 'Int']
+            if(children0[1] != 'String' and children1[1] != 'String'):
+                return [children0[0] * children1[0], 'Int']
+            else:
+                if(children0[1] == 'Bool'):
+                    if(children0[0] == 1):
+                        children0[0] = 'true'
+                    elif(children0[0] == 0):
+                        children0[0] = 'false'
+
+                if(children1[1] == 'Bool'):
+                    if(children1[0] == 1):
+                        children1[0] = 'true'
+                    elif(children1[0] == 0):
+                        children1[0] = 'false'
+
+                return [str(children0[0]) + str(children1[0]), 'String']
 
         elif self.value == "/":
-            return [int(children0[0] / children1[0]), 'Int']
+            if(children0[1] != 'String' and children1[1] != 'String'):
+                return [int(children0[0] / children1[0]), 'Int']
+            else:
+                raise ValueError('/ Operation not valid for String')
 
         elif self.value == "||":
-            if(children0[0] or children1[0]):
-                return [1, 'Bool']
+            if(children0[1] != 'String' and children1[1] != 'String'):
+                if(children0[0] or children1[0]):
+                    return [1, 'Bool']
+                else:
+                    return [0, 'Bool']
             else:
-                return [0, 'Bool']
+                raise ValueError('|| Operation not valid for String')
 
         elif self.value == "&&":
-            if(children0[0] and children1[0]):
-                return [1, 'Bool']
+            if(children0[1] != 'String' and children1[1] != 'String'):
+                if(children0[0] and children1[0]):
+                    return [1, 'Bool']
+                else:
+                    return [0, 'Bool']
             else:
-                return [0, 'Bool']
+                raise ValueError('&& Operation not valid for String')
 
         elif self.value == "==":
             if(children0[0] == children1[0]):
@@ -53,16 +83,22 @@ class BinOp(Node):
                 return [0, 'Bool']
 
         elif self.value == ">":
-            if(children0[0] > children1[0]):
-                return [1, 'Bool']
+            if(children0[1] != 'String' and children1[1] != 'String'):
+                if(children0[0] > children1[0]):
+                    return [1, 'Bool']
+                else:
+                    return [0, 'Bool']
             else:
-                return [0, 'Bool']
+                raise ValueError('> Operation not valid for String')
 
         elif self.value == "<":
-            if(children0[0] < children1[0]):
-                return [1, 'Bool']
+            if(children0[1] != 'String' and children1[1] != 'String'):
+                if(children0[0] < children1[0]):
+                    return [1, 'Bool']
+                else:
+                    return [0, 'Bool']
             else:
-                return [0, 'Bool']
+                raise ValueError('< Operation not valid for String')
 
 
 class UnOp(Node):
@@ -106,6 +142,15 @@ class BoolVal(Node):
             return [1, 'Bool']
         elif(self.value == 'false'):
             return [0, 'Bool']
+
+
+class StringVal(Node):
+
+    def __init__(self, value):
+        self.value = value
+
+    def evaluate(self):
+        return [self.value, 'String']
 
 
 class NoOp(Node):

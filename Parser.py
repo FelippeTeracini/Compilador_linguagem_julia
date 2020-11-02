@@ -16,6 +16,10 @@ class Parser:
             result = BoolVal(Parser.tokens.actual.token_value)
             Parser.tokens.selectNext()
             return result
+        elif(Parser.tokens.actual.token_type == 'STRING'):
+            result = StringVal(Parser.tokens.actual.token_value)
+            Parser.tokens.selectNext()
+            return result
         elif(Parser.tokens.actual.token_type == 'IDENTIFIER'):
             result = Identifier(Parser.tokens.actual.token_value)
             Parser.tokens.selectNext()

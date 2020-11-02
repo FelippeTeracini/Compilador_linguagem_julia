@@ -41,6 +41,17 @@ class Tokenizer:
                 else:
                     self.actual = Token('IDENTIFIER', current_token)
                 self.position += 1
+            elif(current_token == '"'):
+                if(self.position + 1 < len(self.origin)):
+                    string_token = ""
+                    while(self.origin[self.position + 1] != '"'):
+                        self.position += 1
+                        string_token += self.origin[self.position]
+                        if(self.position + 1 >= len(self.origin)):
+                            raise ValueError('Invalid Token')
+                self.actual = Token('STRING', string_token)
+                self.position += 2
+
             elif(current_token == ":"):
                 if(self.position + 1 < len(self.origin)):
                     if(self.origin[self.position + 1] == ":"):

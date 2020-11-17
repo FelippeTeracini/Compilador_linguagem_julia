@@ -2,6 +2,7 @@ class SymbolTable:
 
     def __init__(self):
         self.symbol_table = {}
+        self.pos = 4
 
     def set_symbol(self, symbol, symbol_value):
         if symbol in self.symbol_table.keys():
@@ -19,10 +20,17 @@ class SymbolTable:
             raise ValueError(f'Symbol {symbol} not in symbol table')
 
     def set_type(self, symbol, symbol_type):
-        self.symbol_table[symbol] = [None, symbol_type]
+        self.symbol_table[symbol] = [None, symbol_type, self.pos]
+        self.pos += 4
 
     def get_type(self, symbol):
         if symbol in self.symbol_table.keys():
             return self.symbol_table[symbol][1]
+        else:
+            raise ValueError(f'Symbol {symbol} not in symbol table')
+
+    def get_pos(self, symbol):
+        if symbol in self.symbol_table.keys():
+            return self.symbol_table[symbol][2]
         else:
             raise ValueError(f'Symbol {symbol} not in symbol table')

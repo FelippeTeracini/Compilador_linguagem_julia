@@ -1,13 +1,11 @@
-local x::Int
-local y::String
-x = 0
-y = "mamus"
-while y == "mamus"
-x = x + 1
-println(x)
-if x > 2
-y = "dale"
+local i::Int
+local n::Int
+local f::Int
+i = 2
+n = 5
+f = 1
+while (i < n + 1)
+f = f * i
+i = i + 1
 end
-end
-println("terminei")
-
+println(f)

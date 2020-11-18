@@ -376,6 +376,7 @@ class If(Node):
         self.children[1].evaluate()
         assembler.addLine(f"EXIT_{self.id}:")
         if(self.children[2]):
+            self.children[0].evaluate()
             self.children[2].evaluate()
         # if(self.children[0].evaluate()[0]):
         #     self.children[1].evaluate()
@@ -390,5 +391,8 @@ class Else(Node):
         self.id = Node.getId()
 
     def evaluate(self):
+        assembler.addLine(f"CMP EBX, False")
+        assembler.addLine(f"JNE EXIT_{self.id}")
         self.children[0].evaluate()
+        assembler.addLine(f"EXIT_{self.id}:")
         # return self.children[0].evaluate()

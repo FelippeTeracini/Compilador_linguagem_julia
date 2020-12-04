@@ -272,7 +272,7 @@ class Parser:
             if(Parser.tokens.actual.token_type == 'FUNCTION'):
                 Parser.tokens.selectNext()
                 if(Parser.tokens.actual.token_type == 'IDENTIFIER'):
-                    func_node = FuncDec(Parser.tokens.actual.token_value)
+                    func_node = FuncDec(Parser.tokens.actual.token_value, None)
                     main_node.children.append(func_node)
                     Parser.tokens.selectNext()
                     if(Parser.tokens.actual.token_type == 'OPEN_P'):
@@ -320,6 +320,7 @@ class Parser:
                             if(Parser.tokens.actual.token_type == 'SET_TYPE'):
                                 Parser.tokens.selectNext()
                                 if(Parser.tokens.actual.token_type == 'INT_TYPE' or Parser.tokens.actual.token_type == 'BOOL_TYPE' or Parser.tokens.actual.token_type == 'STRING_TYPE'):
+                                    func_node._type = Parser.tokens.actual.token_value
                                     Parser.tokens.selectNext()
                                     if(Parser.tokens.actual.token_type == 'END_LINE'):
                                         Parser.tokens.selectNext()

@@ -240,11 +240,15 @@ class If(Node):
         self.children = [None, None, None]
 
     def evaluate(self):
-        if(self.children[0].evaluate()[0]):
-            self.children[1].evaluate()
+        ev = self.children[0].evaluate()
+        if(ev[1] != 'String'):
+            if(ev[0]):
+                self.children[1].evaluate()
+            else:
+                if(self.children[2]):
+                    self.children[2].evaluate()
         else:
-            if(self.children[2]):
-                self.children[2].evaluate()
+            raise ValueError('If does not accept string')
 
 
 class Else(Node):
@@ -253,3 +257,29 @@ class Else(Node):
 
     def evaluate(self):
         return self.children[0].evaluate()
+
+
+class FuncDec(Node):
+    def __init__(self, value):
+        self.children = []
+        self.value = value
+
+    def evaluate(self):
+        pass
+
+
+class Return(Node):
+    def __init__(self):
+        self.children = [None]
+
+    def evaluate(self):
+        pass
+
+
+class FuncCall(Node):
+    def __init__(self, value):
+        self.value = value
+        self.children = []
+
+    def evaluate(self):
+        pass

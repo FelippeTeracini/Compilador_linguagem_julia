@@ -21,8 +21,23 @@ class Parser:
             Parser.tokens.selectNext()
             return result
         elif(Parser.tokens.actual.token_type == 'IDENTIFIER'):
-            result = Identifier(Parser.tokens.actual.token_value)
+            ident = Parser.tokens.actual.token_value
             Parser.tokens.selectNext()
+            if(Parser.tokens.actual.token_type == 'OPEN_P'):
+                result = FuncCall(ident)
+                Parser.tokens.selectNext()
+                if(Parser.tokens.actual.token_type != 'CLOSE_P'):
+                    result.children.append(Parser.parseRelEx())
+                    while(Parser.tokens.actual.token_type == 'COMMA'):
+                        Parser.tokens.selectNext()
+                        result.children.append(Parser.parseRelEx())
+                if(Parser.tokens.actual.token_type == 'CLOSE_P'):
+                    Parser.tokens.selectNext()
+                else:
+                    raise ValueError(
+                        'OPEN_P needs matching CLOSE_P (IDENTIFIER FACTOR)')
+            else:
+                result = Identifier(ident)
             return result
         elif(Parser.tokens.actual.token_type == 'PLUS' or Parser.tokens.actual.token_type == 'MINUS' or Parser.tokens.actual.token_type == 'NOT'):
             result = UnOp(Parser.tokens.actual.token_value)
@@ -70,31 +85,46 @@ class Parser:
     def parseCommand():
         node = NoOp()
         if(Parser.tokens.actual.token_type == 'IDENTIFIER'):
-            identifier = Identifier(Parser.tokens.actual.token_value)
+            ident = Parser.tokens.actual.token_value
             Parser.tokens.selectNext()
-            if(Parser.tokens.actual.token_type == 'SET_EQUAL'):
+            if(Parser.tokens.actual.token_type == 'OPEN_P'):
+                node = FuncCall(ident)
                 Parser.tokens.selectNext()
-                node = Assignement()
-                node.children[0] = identifier
-                if(Parser.tokens.actual.token_type == 'RDLN'):
-                    Parser.tokens.selectNext()
-                    node.children[1] = ReadLine()
-                    if(Parser.tokens.actual.token_type == 'OPEN_P'):
+                if(Parser.tokens.actual.token_type != 'CLOSE_P'):
+                    node.children.append(Parser.parseRelEx())
+                    while(Parser.tokens.actual.token_type == 'COMMA'):
                         Parser.tokens.selectNext()
-                        if(Parser.tokens.actual.token_type == 'CLOSE_P'):
+                        node.children.append(Parser.parseRelEx())
+                if(Parser.tokens.actual.token_type == 'CLOSE_P'):
+                    Parser.tokens.selectNext()
+                else:
+                    raise ValueError(
+                        'OPEN_P needs matching CLOSE_P (IDENTIFIER FACTOR)')
+            else:
+                identifier = Identifier(ident)
+                if(Parser.tokens.actual.token_type == 'SET_EQUAL'):
+                    Parser.tokens.selectNext()
+                    node = Assignement()
+                    node.children[0] = identifier
+                    if(Parser.tokens.actual.token_type == 'RDLN'):
+                        Parser.tokens.selectNext()
+                        node.children[1] = ReadLine()
+                        if(Parser.tokens.actual.token_type == 'OPEN_P'):
                             Parser.tokens.selectNext()
+                            if(Parser.tokens.actual.token_type == 'CLOSE_P'):
+                                Parser.tokens.selectNext()
+                            else:
+                                raise ValueError(
+                                    'READLINE: OPEN_P token needs CLOSE_P token after in command')
                         else:
                             raise ValueError(
-                                'READLINE: OPEN_P token needs CLOSE_P token after in command')
+                                'READLINE token needs OPEN_P token after in command')
                     else:
-                        raise ValueError(
-                            'READLINE token needs OPEN_P token after in command')
-                else:
-                    node.children[1] = Parser.parseRelEx()
+                        node.children[1] = Parser.parseRelEx()
 
-            else:
-                raise ValueError(
-                    "IDENTIFIER token needs SET_EQUAL token after in COMMAND")
+                else:
+                    raise ValueError(
+                        "IDENTIFIER (NOT FUNCCALL) token needs SET_EQUAL token after in COMMAND")
         elif(Parser.tokens.actual.token_type == 'PRINT'):
             Parser.tokens.selectNext()
             if(Parser.tokens.actual.token_type == 'OPEN_P'):
@@ -205,6 +235,11 @@ class Parser:
                         "Needs SET_TYPE after IDENTIFIER after LOCAL")
             else:
                 raise ValueError("Needs IDENTIFIER after LOCAL")
+        elif(Parser.tokens.actual.token_type == 'RETURN'):
+            node = Return()
+            Parser.tokens.selectNext()
+            node.children[0] = Parser.parseRelEx()
+
         if(Parser.tokens.actual.token_type == 'END_LINE'):
             Parser.tokens.selectNext()
             return node
@@ -225,15 +260,107 @@ class Parser:
 
     @staticmethod
     def parseBlock():
-        node = Statement()
+        main_node = Statement()
         while(Parser.tokens.actual.token_type != 'EOF' and Parser.tokens.actual.token_type != 'END' and Parser.tokens.actual.token_type != 'ELSE' and Parser.tokens.actual.token_type != 'ELSEIF'):
-            node.children.append(Parser.parseCommand())
-        return node
+            main_node.children.append(Parser.parseCommand())
+        return main_node
+
+    @staticmethod
+    def parseBlockMain():
+        main_node = Statement()
+        while(Parser.tokens.actual.token_type != 'EOF'):
+            if(Parser.tokens.actual.token_type == 'FUNCTION'):
+                Parser.tokens.selectNext()
+                if(Parser.tokens.actual.token_type == 'IDENTIFIER'):
+                    func_node = FuncDec(Parser.tokens.actual.token_value)
+                    main_node.children.append(func_node)
+                    Parser.tokens.selectNext()
+                    if(Parser.tokens.actual.token_type == 'OPEN_P'):
+                        Parser.tokens.selectNext()
+                        if(Parser.tokens.actual.token_type == 'IDENTIFIER'):
+                            ident_node = [None, None]
+                            ident_node[0] = Parser.tokens.actual.token_value
+                            Parser.tokens.selectNext()
+                            if(Parser.tokens.actual.token_type == 'SET_TYPE'):
+                                Parser.tokens.selectNext()
+                                if(Parser.tokens.actual.token_type == 'INT_TYPE' or Parser.tokens.actual.token_type == 'BOOL_TYPE' or Parser.tokens.actual.token_type == 'STRING_TYPE'):
+                                    ident_node[1] = Parser.tokens.actual.token_value
+                                    func_node.children.append(ident_node)
+                                    Parser.tokens.selectNext()
+                                    while(Parser.tokens.actual.token_type == 'COMMA'):
+                                        Parser.tokens.selectNext()
+                                        if(Parser.tokens.actual.token_type == 'IDENTIFIER'):
+                                            ident_node = [None, None]
+                                            ident_node[0] = Parser.tokens.actual.token_value
+                                            Parser.tokens.selectNext()
+                                            if(Parser.tokens.actual.token_type == 'SET_TYPE'):
+                                                Parser.tokens.selectNext()
+                                                if(Parser.tokens.actual.token_type == 'INT_TYPE' or Parser.tokens.actual.token_type == 'BOOL_TYPE' or Parser.tokens.actual.token_type == 'STRING_TYPE'):
+                                                    ident_node[1] = Parser.tokens.actual.token_value
+                                                    func_node.children.append(
+                                                        ident_node)
+                                                    Parser.tokens.selectNext()
+                                                else:
+                                                    raise ValueError(
+                                                        'FUNCTION SET_TYPE needs TYPE after')
+                                            else:
+                                                raise ValueError(
+                                                    'FUNCTION IDENTIFIER needs SET_TYPE after')
+                                        else:
+                                            raise ValueError(
+                                                'FUNCTION needs IDENTIFIER after COMMA')
+                                else:
+                                    raise ValueError(
+                                        'FUNCTION SET_TYPE needs TYPE after')
+                            else:
+                                raise ValueError(
+                                    'FUNCTION IDENTIFIER needs SET_TYPE after')
+                        if(Parser.tokens.actual.token_type == 'CLOSE_P'):
+                            Parser.tokens.selectNext()
+                            if(Parser.tokens.actual.token_type == 'SET_TYPE'):
+                                Parser.tokens.selectNext()
+                                if(Parser.tokens.actual.token_type == 'INT_TYPE' or Parser.tokens.actual.token_type == 'BOOL_TYPE' or Parser.tokens.actual.token_type == 'STRING_TYPE'):
+                                    Parser.tokens.selectNext()
+                                    if(Parser.tokens.actual.token_type == 'END_LINE'):
+                                        Parser.tokens.selectNext()
+                                        statement_node = Parser.parseBlock()
+                                        func_node.children.append(
+                                            statement_node)
+                                        if(Parser.tokens.actual.token_type == 'END'):
+                                            Parser.tokens.selectNext()
+                                            if(Parser.tokens.actual.token_type == 'END_LINE'):
+                                                Parser.tokens.selectNext()
+                                            else:
+                                                raise ValueError(
+                                                    'END needs END_LINE after')
+                                        else:
+                                            raise ValueError(
+                                                'FUNCTION needs END')
+                                    else:
+                                        raise ValueError(
+                                            'FUNCTION needs END_LINE after TYPE')
+                                else:
+                                    raise ValueError(
+                                        'FUNCTION SET_TYPE needs TYPE after')
+                            else:
+                                raise ValueError(
+                                    'FUNCTION CLOSE_P needs SET_TYPE after')
+                        else:
+                            raise ValueError(
+                                'FUNCTION OPEN_P needs matching CLOSE_P')
+                    else:
+                        raise ValueError(
+                            'FUNCTION IDENTIFIER needs OPEN_P after')
+                else:
+                    raise ValueError('FUNCTION needs IDENTIFIER after')
+            else:
+                main_node.children.append(Parser.parseCommand())
+        return main_node
 
     @staticmethod
     def run(code):
         Parser.tokens = Tokenizer(code)
-        result = Parser.parseBlock()
+        result = Parser.parseBlockMain()
         if(Parser.tokens.actual.token_type == 'EOF'):
             return result
         else:

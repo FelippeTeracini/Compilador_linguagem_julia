@@ -10,7 +10,8 @@ class Tokenizer:
                          "if": 'IF', "elseif": 'ELSEIF', "else": 'ELSE',
                          "end": 'END', "readline": 'RDLN', "local": 'LOCAL',
                          "Int": 'INT_TYPE', "Bool": 'BOOL_TYPE', "String": 'STRING_TYPE',
-                         "true": 'TRUE', "false": 'FALSE'}
+                         "true": 'TRUE', "false": 'FALSE', "function": 'FUNCTION',
+                         "return": 'RETURN'}
         self.selectNext()
 
     def selectNext(self):
@@ -85,6 +86,9 @@ class Tokenizer:
                 self.position += 1
             elif(current_token == "!"):
                 self.actual = Token('NOT', current_token)
+                self.position += 1
+            elif(current_token == ","):
+                self.actual = Token('COMMA', current_token)
                 self.position += 1
             elif(current_token == "&"):
                 if(self.position + 1 < len(self.origin)):

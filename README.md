@@ -3,7 +3,7 @@ Compilador
 
 # EBNF
 
-    PROGRAM = { FUNCTION | COMMAND } ;
+    MAIN = { FUNCTION | COMMAND } ;
     BLOCK = { COMMAND } ;
     FUNCTION = "function", IDENTIFIER, "(", (IDENTIFIER, "::", TYPE), {"," , IDENTIFIER, "::", TYPE}, ")", "::", TYPE, "\n", BLOCK, "end" ;
     FUNCALL = IDENTIFIER, "(", (REL_EXPRESSION), {"," , REL_EXPRESSION}, ")" ;
